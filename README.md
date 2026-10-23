@@ -1,15 +1,24 @@
 # CodeAlpha_NetworkSniffer
-Basic network sniffer in Python with `scapy` (CodeAlpha Cyber Security, Task 1).
 
-It captures live packets and shows source/destination IPs, protocol (TCP, UDP, DNS, ICMP), ports, TCP flags, and a printable payload preview, then a per-protocol summary.
+CodeAlpha Cyber Security Internship, Task 1: a basic network sniffer in Python using `scapy`.
 
-## Run
-```
+It captures packets and shows each packet's time, protocol (TCP, UDP, DNS, ICMP, ARP), source and destination IP and port, TCP flags, DNS queries, and a readable preview of the payload. At the end it prints a per-protocol summary.
+
+## Setup
+```bash
 pip install -r requirements.txt
-sudo python3 sniffer.py -c 20
-sudo python3 sniffer.py -f "udp port 53"   # DNS only
 ```
-Use it only on networks you own or are allowed to monitor.
+Windows users also need [Npcap](https://npcap.com/).
 
-## How data flows
-Each packet is layered: Ethernet frame, then the IP header (who to who), then the transport header (TCP/UDP ports), then the application payload. The sniffer peels these layers to show each one.
+## Usage
+```bash
+sudo python3 sniffer.py                      # live capture until Ctrl+C
+sudo python3 sniffer.py -c 50 -f "tcp port 80"  # 50 HTTP packets
+sudo python3 sniffer.py -c 100 -w out.pcap   # save a capture
+python3 make_sample.py && python3 sniffer.py -r sample.pcap   # demo without root
+```
+
+## How it works
+Packets travel in layers: Ethernet frames carry IP packets, which carry TCP or UDP segments, which carry application data such as HTTP or DNS. `scapy` decodes each layer, and the sniffer reads the fields from each one in turn.
+
+Only capture traffic on networks you own or have permission to monitor.
